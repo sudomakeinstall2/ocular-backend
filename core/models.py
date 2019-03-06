@@ -13,7 +13,7 @@ class Project(models.Model):
     description = models.TextField()
     deadline = models.DateField()
     cost = models.IntegerField()
-    created = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
 
 
 class Milestone(models.Model):
@@ -29,7 +29,7 @@ class Proposal(models.Model):
     user = models.OneToOneField(User, on_delete=models.PROTECT)
     employer_accepted = models.BooleanField(default=False)
     employee_accepted = models.BooleanField(default=False)
-    created = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
 
     def accepted(self):
         return self.employee_accepted and self.employer_accepted

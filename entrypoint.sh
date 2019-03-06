@@ -13,5 +13,6 @@ then
 fi
 ./manage.py flush --no-input
 ./manage.py migrate
+./manage.py collectstatic
 
 gunicorn ocular_back.wsgi:application --bind 0.0.0.0:8000 --reload
