@@ -6,3 +6,4 @@ djangorestframework
 markdown
 django-filter
 django-allauth
+django-rest-auth
