@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.urls import include
 
-from .project_views import ProjectList, ProposalList, MilestoneList
+from .project_views import MilestoneList, ProjectList, ProposalList
 
 urlpatterns = [
     url('rest-auth/', include('rest_auth.urls')),

@@ -8,7 +8,7 @@ class Profile(models.Model):
 
 
 class Project(models.Model):
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     title = models.CharField(blank=False, max_length=300)
     description = models.TextField()
     deadline = models.DateField()
@@ -17,16 +17,16 @@ class Project(models.Model):
 
 
 class Milestone(models.Model):
-    project = models.OneToOneField(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     deadline = models.DateField()
     title = models.CharField(blank=False, max_length=300)
     description = models.TextField()
 
 
 class Proposal(models.Model):
-    project = models.OneToOneField(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     cost = models.IntegerField()
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     employer_accepted = models.BooleanField(default=False)
     employee_accepted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)

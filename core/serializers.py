@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Project, Milestone, Proposal
+from .models import Milestone, Project, Proposal
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -19,4 +19,3 @@ class ProposalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proposal
         exclude = ()
-
