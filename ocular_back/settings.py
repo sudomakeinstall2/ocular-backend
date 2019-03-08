@@ -37,14 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',  # new
+    'django.contrib.sites',
     # 3rd party
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
-    'allauth',  # new
-    'allauth.account',  # new
-    'allauth.socialaccount',  # new
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 
     # local
     'core',
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'ocular_back.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('SQL_DATABASE'),
+        'NAME': os.getenv('SQL_DATABASE', 'postgres'),
         'USER': os.getenv('SQL_USER'),
         'PASSWORD': os.getenv('SQL_PASSWORD'),
         'HOST': os.getenv('SQL_HOST'),

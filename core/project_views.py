@@ -1,8 +1,8 @@
 import logging
 
-from rest_framework import generics, status
-from rest_framework.response import Response
+from rest_framework import generics, permissions
 
+from core.permissions import IsProjectOwner, IsReadOnly, IsEmployeeCreatingProposalForHerself
 from .models import Milestone, Project, Proposal
 from .serializers import (MilestoneSerializer, ProjectSerializer,
                           ProposalSerializer)
@@ -11,24 +11,31 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectList(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        logger.info(request.user.pk)
-        serializer.initial_data['user'] = request.user.pk
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class MilestoneList(generics.ListCreateAPIView):
-    queryset = Milestone.objects.all()
+    permission_classes = (permissions.IsAuthenticated | IsReadOnly, IsReadOnly | IsProjectOwner,)
     serializer_class = MilestoneSerializer
+
+    def get_queryset(self):
+        return Milestone.objects.filter(project_id=self.kwargs['project_id'])
+
+    def perform_create(self, serializer):
+        serializer.save(project=Project.objects.get(pk=self.kwargs['project_id']))
 
 
 class ProposalList(generics.ListCreateAPIView):
-    queryset = Proposal.objects.all()
+    permission_classes = (IsProjectOwner | IsEmployeeCreatingProposalForHerself, )
     serializer_class = ProposalSerializer
+
+    def get_queryset(self):
+        return Proposal.objects.filter(project_id=self.kwargs['project_id'])
+
+    def perform_create(self, serializer):
+        serializer.save(project=Project.objects.get(pk=self.kwargs['project_id']))
