@@ -27,6 +27,7 @@ class ProposalTestCase(APITestCase):
         self.client.force_authenticate(user=self.project.owner)
         response = self.client.post(self.url, self.proposal_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.expected_data['employer_accepted'] = True
         for key in self.expected_data:
             self.assertEqual(self.expected_data[key], response.data[key])
 
@@ -34,6 +35,7 @@ class ProposalTestCase(APITestCase):
         self.client.force_authenticate(user=self.employee)
         response = self.client.post(self.url, self.proposal_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.expected_data['employee_accepted'] = True
         for key in self.expected_data:
             self.assertEqual(self.expected_data[key], response.data[key])
 
