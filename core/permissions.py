@@ -14,6 +14,13 @@ class IsReadOnly(permissions.BasePermission):
         return request.method in SAFE_METHODS
 
 
+class IsOwner(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        project_id = view.kwargs['pk']
+        return Project.objects.get(pk=project_id).owner == request.user
+
+
 class IsProjectOwner(permissions.BasePermission):
 
     def has_permission(self, request, view):
