@@ -2,7 +2,8 @@ import logging
 
 from rest_framework import generics, permissions
 
-from core.permissions import IsProjectOwner, IsReadOnly, IsEmployeeCreatingProposalForHerself, IsOwner
+from core.permissions import IsProjectOwner, IsReadOnly, IsEmployeeCreatingProposalForHerself, IsOwner, \
+    HasAccessToProposal
 from .models import Milestone, Project, Proposal
 from .serializers import (MilestoneSerializer, ProjectSerializer,
                           ProposalSerializer)
@@ -25,6 +26,12 @@ class ProjectList(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
+class MilestoneDetail(generics.RetrieveUpdateAPIView):
+    permission_classes = (permissions.IsAuthenticated | IsReadOnly, IsReadOnly | IsProjectOwner,)
+    queryset = Milestone.objects.all()
+    serializer_class = MilestoneSerializer
+
+
 class MilestoneList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated | IsReadOnly, IsReadOnly | IsProjectOwner,)
     serializer_class = MilestoneSerializer
@@ -45,10 +52,15 @@ class ProposalList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         project = Project.objects.get(pk=self.kwargs['project_id'])
-        logger.info(serializer.validated_data)
         if self.request.user == project.owner:
             serializer.save(project=project, employer_accepted=True)
         elif self.request.user == serializer.validated_data['user']:
             serializer.save(project=project, employee_accepted=True)
         else:
             raise Exception("Unauthorized proposal creation")
+
+
+class ProposalDetail(generics.RetrieveAPIView):
+    permission_classes = (HasAccessToProposal, )
+    queryset = Proposal.objects.all()
+    serializer_class = ProposalSerializer

@@ -8,7 +8,7 @@ from core.models import Project
 
 
 # noinspection PyAttributeOutsideInit
-class ProposalTestCase(APITestCase):
+class ProjectDetailTestCase(APITestCase):
 
     def setUp(self):
         self.project = mommy.make(Project)

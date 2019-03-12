@@ -8,12 +8,12 @@ from core.models import Proposal, Project
 
 
 # noinspection PyAttributeOutsideInit
-class ProposalTestCase(APITestCase):
+class ProposalListTestCase(APITestCase):
 
     def setUp(self):
         self.project = mommy.make(Project)
         self.employee = mommy.make(User)
-        self.url = reverse('proposal-list', args=(self.project.pk,))
+        self.url = reverse('project-proposal-list', args=(self.project.pk,))
         self.proposal_data = {'cost': 1000, 'user': self.employee.pk}
         self.expected_data = {
             'project': self.project.title,
@@ -60,3 +60,44 @@ class ProposalTestCase(APITestCase):
         self.client.force_authenticate(user=self.employee)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+# noinspection PyAttributeOutsideInit
+class ProposalDetailTestCase(APITestCase):
+
+    def setUp(self):
+        self.proposal = mommy.make(Proposal)
+        self.employee = mommy.make(User)
+        self.url = reverse('proposal-detail', args=(self.proposal.pk, ))
+
+    def test_owner_get_proposal(self):
+        self.client.force_authenticate(user=self.proposal.project.owner)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['cost'], self.proposal.cost)
+
+    def test_employee_get_proposal(self):
+        self.client.force_authenticate(user=self.employee)
+        self.proposal.user = self.employee
+        self.proposal.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_forbidden_get_proposal(self):
+        self.client.force_authenticate(user=self.employee)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+# noinspection PyAttributeOutsideInit
+class ProposalUpdateTestCase(APITestCase):
+
+    def setUp(self):
+        self.proposal = mommy.make(Proposal)
+        self.employee = mommy.make(User)
+        self.url = reverse('proposal-detail', args=(self.proposal.pk, ))
+
+    def test_forbidden_update_proposal(self):
+        self.client.force_authenticate(user=self.proposal.owner)
+        response = self.client.patch(self.url, {})
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
