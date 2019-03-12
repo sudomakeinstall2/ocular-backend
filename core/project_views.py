@@ -1,9 +1,10 @@
 import logging
 
+from django.db.models import Q
 from rest_framework import generics, permissions
 
 from core.permissions import IsProjectOwner, IsReadOnly, IsEmployeeCreatingProposalForHerself, IsOwner, \
-    HasAccessToProposal
+    HasAccessToProposal, IsSameUser
 from .models import Milestone, Project, Proposal
 from .serializers import (MilestoneSerializer, ProjectSerializer,
                           ProposalSerializer)
@@ -43,7 +44,7 @@ class MilestoneList(generics.ListCreateAPIView):
         serializer.save(project=Project.objects.get(pk=self.kwargs['project_id']))
 
 
-class ProposalList(generics.ListCreateAPIView):
+class ProjectProposalList(generics.ListCreateAPIView):
     permission_classes = (IsProjectOwner | IsEmployeeCreatingProposalForHerself, )
     serializer_class = ProposalSerializer
 
@@ -58,6 +59,15 @@ class ProposalList(generics.ListCreateAPIView):
             serializer.save(project=project, employee_accepted=True)
         else:
             raise Exception("Unauthorized proposal creation")
+
+
+class UserProposalList(generics.ListAPIView):
+    permission_classes = (IsSameUser, )
+    serializer_class = ProposalSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['pk']
+        return Proposal.objects.filter(Q(user__pk=user_id) | Q(project__owner__pk=user_id))
 
 
 class ProposalDetail(generics.RetrieveAPIView):

@@ -8,7 +8,7 @@ from core.models import Proposal, Project
 
 
 # noinspection PyAttributeOutsideInit
-class ProposalListTestCase(APITestCase):
+class ProjectProposalListTestCase(APITestCase):
 
     def setUp(self):
         self.project = mommy.make(Project)
@@ -59,6 +59,31 @@ class ProposalListTestCase(APITestCase):
     def test_permission_denied_on_listing_proposals(self):
         self.client.force_authenticate(user=self.employee)
         response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+# noinspection PyAttributeOutsideInit
+class UserProposalListTestCase(APITestCase):
+
+    def setUp(self):
+        self.user1 = mommy.make(User)
+        self.user2 = mommy.make(User)
+
+        self.proposal = mommy.make(Proposal)
+        self.proposal1 = mommy.make(Proposal, project__owner=self.user1, user=self.user2)
+        self.proposal2 = mommy.make(Proposal, project__owner=self.user2, user=self.user1)
+
+    def test_proposal_list(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('user-proposal-list', args=(self.user1.pk,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+    def test_forbidden_proposal_list(self):
+        self.client.force_authenticate(user=self.proposal.owner)
+        url = reverse('user-proposal-list', args=(self.user1.pk,))
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 

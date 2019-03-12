@@ -21,6 +21,13 @@ class IsOwner(permissions.BasePermission):
         return Project.objects.get(pk=project_id).owner == request.user
 
 
+class IsSameUser(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        user_id = view.kwargs['pk']
+        return request.user.pk == user_id
+
+
 class IsProjectOwner(permissions.BasePermission):
 
     def has_permission(self, request, view):
