@@ -35,3 +35,14 @@ class IsEmployeeCreatingProposalForHerself(permissions.BasePermission):
             return False
 
         return request.user.pk == int(request.data['user'])
+
+
+class HasAccessToProposal(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, object):
+
+        if object.owner == request.user:
+            return True
+        if object.user == request.user:
+            return True
+        return False
