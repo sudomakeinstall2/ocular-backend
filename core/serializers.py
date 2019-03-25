@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Milestone, Project, Proposal
+from .models import Answer, Milestone, Project, Proposal
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -21,7 +21,14 @@ class MilestoneSerializer(serializers.ModelSerializer):
 
 class ProposalSerializer(serializers.ModelSerializer):
     project = serializers.ReadOnlyField(source='project.title')
+    answer = serializers.ReadOnlyField(source='answer.id')
 
     class Meta:
         model = Proposal
+        exclude = ()
+
+
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
         exclude = ()

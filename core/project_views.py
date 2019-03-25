@@ -2,12 +2,15 @@ import logging
 
 from django.db.models import Q
 from rest_framework import generics, permissions
+from rest_framework.exceptions import ValidationError
 
-from core.permissions import IsProjectOwner, IsReadOnly, IsEmployeeCreatingProposalForHerself, IsOwner, \
-    HasAccessToProposal, IsSameUser
-from .models import Milestone, Project, Proposal
-from .serializers import (MilestoneSerializer, ProjectSerializer,
-                          ProposalSerializer)
+from core.permissions import (HasAccessToAnswer, HasAccessToProposal,
+                              IsEmployeeCreatingProposalForHerself, IsOwner,
+                              IsProjectOwner, IsReadOnly, IsSameUser)
+
+from .models import Answer, Milestone, Project, Proposal
+from .serializers import (AnswerSerializer, MilestoneSerializer,
+                          ProjectSerializer, ProposalSerializer)
 
 logger = logging.getLogger(__name__)
 
@@ -53,10 +56,11 @@ class ProjectProposalList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         project = Project.objects.get(pk=self.kwargs['project_id'])
+        proposal = serializer.save(project=project)
         if self.request.user == project.owner:
-            serializer.save(project=project, employer_accepted=True)
+            Answer.objects.create(proposal=proposal, owner=serializer.validated_data['user'])
         elif self.request.user == serializer.validated_data['user']:
-            serializer.save(project=project, employee_accepted=True)
+            Answer.objects.create(proposal=proposal, owner=project.owner)
         else:
             raise Exception("Unauthorized proposal creation")
 
@@ -74,3 +78,15 @@ class ProposalDetail(generics.RetrieveAPIView):
     permission_classes = (HasAccessToProposal, )
     queryset = Proposal.objects.all()
     serializer_class = ProposalSerializer
+
+
+class AnswerDetail(generics.RetrieveUpdateAPIView):
+    permission_classes = (HasAccessToAnswer, )
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+
+    def perform_update(self, serializer):
+        answer = Answer.objects.get(pk=self.kwargs['pk'])
+        if answer.state != Answer.NOT_ANSWERED:
+            raise ValidationError(detail="Already answered.")
+        serializer.save()

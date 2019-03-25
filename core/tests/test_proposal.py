@@ -4,7 +4,7 @@ from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from core.models import Proposal, Project
+from core.models import Answer, Project, Proposal
 
 
 # noinspection PyAttributeOutsideInit
@@ -18,8 +18,6 @@ class ProjectProposalListTestCase(APITestCase):
         self.expected_data = {
             'project': self.project.title,
             'cost': self.proposal_data['cost'],
-            'employer_accepted': False,
-            'employee_accepted': False,
             'user': self.proposal_data['user']
         }
 
@@ -27,17 +25,19 @@ class ProjectProposalListTestCase(APITestCase):
         self.client.force_authenticate(user=self.project.owner)
         response = self.client.post(self.url, self.proposal_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.expected_data['employer_accepted'] = True
         for key in self.expected_data:
             self.assertEqual(self.expected_data[key], response.data[key])
+        answer = Answer.objects.get(pk=int(response.data['answer']))
+        self.assertEqual(answer.owner, self.employee)
 
     def test_employee_create_proposal(self):
         self.client.force_authenticate(user=self.employee)
         response = self.client.post(self.url, self.proposal_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.expected_data['employee_accepted'] = True
         for key in self.expected_data:
             self.assertEqual(self.expected_data[key], response.data[key])
+        answer = Answer.objects.get(pk=int(response.data['answer']))
+        self.assertEqual(answer.owner, self.project.owner)
 
     def test_unauthorized(self):
         response = self.client.post(self.url, self.proposal_data)

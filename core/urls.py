@@ -1,7 +1,8 @@
 from django.urls import include, path
 
-from .project_views import MilestoneList, ProjectList, ProjectProposalList, ProjectDetail, MilestoneDetail, \
-    ProposalDetail, UserProposalList
+from .project_views import (AnswerDetail, MilestoneDetail, MilestoneList,
+                            ProjectDetail, ProjectList, ProjectProposalList,
+                            ProposalDetail, UserProposalList)
 
 urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
@@ -16,5 +17,6 @@ urlpatterns = [
          name='user-proposal-list'),
     path('projects/', ProjectList.as_view()),
     path('projects/<int:pk>/', ProjectDetail.as_view(), name='project-detail'),
-    path('proposal/<int:pk>/', ProposalDetail.as_view(), name='proposal-detail')
+    path('proposal/<int:pk>/', ProposalDetail.as_view(), name='proposal-detail'),
+    path('answer/<int:pk>/', AnswerDetail.as_view(), name='answer-detail'),
 ]

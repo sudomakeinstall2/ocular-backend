@@ -31,8 +31,6 @@ class Proposal(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     cost = models.PositiveIntegerField()
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    employer_accepted = models.BooleanField(default=False)
-    employee_accepted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
 
     @property
@@ -41,3 +39,21 @@ class Proposal(models.Model):
 
     def accepted(self):
         return self.employee_accepted and self.employer_accepted
+
+
+class Answer(models.Model):
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    NOT_ANSWERED = "not_answered"
+    ANSWER_STATE_CHOICES = (
+        (ACCEPTED, 'accepted'),
+        (REJECTED, 'rejected'),
+        (NOT_ANSWERED, 'not_answered'),
+    )
+
+    owner = models.ForeignKey(User, on_delete=models.PROTECT)
+    proposal = models.OneToOneField(Proposal, on_delete=models.CASCADE)
+    state = models.CharField(max_length=20, default=NOT_ANSWERED,
+                             choices=ANSWER_STATE_CHOICES)
+    reason = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
