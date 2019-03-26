@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions
 from rest_framework.exceptions import ValidationError
@@ -10,7 +11,7 @@ from core.permissions import (HasAccessToAnswer, HasAccessToProposal,
 
 from .models import Answer, Milestone, Project, Proposal
 from .serializers import (AnswerSerializer, MilestoneSerializer,
-                          ProjectSerializer, ProposalSerializer)
+                          ProjectSerializer, ProposalSerializer, UserSerializer)
 
 logger = logging.getLogger(__name__)
 
@@ -90,3 +91,14 @@ class AnswerDetail(generics.RetrieveUpdateAPIView):
         if answer.state != Answer.NOT_ANSWERED:
             raise ValidationError(detail="Already answered.")
         serializer.save()
+
+
+class SelfUserDetail(generics.RetrieveAPIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        obj = User.objects.get(pk=self.request.user.pk)
+        self.check_object_permissions(self.request, obj)
+        return obj

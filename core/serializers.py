@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import Answer, Milestone, Project, Proposal
@@ -32,3 +33,9 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         exclude = ()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'id')

@@ -8,3 +8,4 @@ django-filter
 django-allauth
 django-rest-auth
 model_mommy
+django-cors-headers
