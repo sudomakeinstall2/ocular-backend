@@ -58,6 +58,8 @@ class ProjectProposalList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         project = Project.objects.get(pk=self.kwargs['project_id'])
         proposal = serializer.save(project=project)
+        if self.request.user == serializer.validated_data['user']:
+            raise ValidationError("Can't create proposal for yourself!")
         if self.request.user == project.owner:
             Answer.objects.create(proposal=proposal, owner=serializer.validated_data['user'])
         elif self.request.user == serializer.validated_data['user']:
