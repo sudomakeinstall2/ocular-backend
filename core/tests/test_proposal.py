@@ -39,6 +39,12 @@ class ProjectProposalListTestCase(APITestCase):
         answer = Answer.objects.get(pk=int(response.data['answer']))
         self.assertEqual(answer.owner, self.project.owner)
 
+    def test_owner_cant_create_proposal_for_self(self):
+        self.client.force_authenticate(user=self.project.owner)
+        self.proposal_data['user'] = self.project.owner.pk
+        response = self.client.post(self.url, self.proposal_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_unauthorized(self):
         response = self.client.post(self.url, self.proposal_data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
