@@ -23,6 +23,7 @@ class MilestoneSerializer(serializers.ModelSerializer):
 class ProposalSerializer(serializers.ModelSerializer):
     project = serializers.ReadOnlyField(source='project.title')
     answer = serializers.ReadOnlyField(source='answer.id')
+    answer_state = serializers.ReadOnlyField(source='answer.state')
 
     class Meta:
         model = Proposal
