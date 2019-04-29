@@ -42,7 +42,7 @@ class MilestoneList(generics.ListCreateAPIView):
     serializer_class = MilestoneSerializer
 
     def get_queryset(self):
-        return Milestone.objects.filter(project_id=self.kwargs['project_id'])
+        return Milestone.objects.filter(project_id=self.kwargs['project_id']).order_by('deadline')
 
     def perform_create(self, serializer):
         serializer.save(project=Project.objects.get(pk=self.kwargs['project_id']))
