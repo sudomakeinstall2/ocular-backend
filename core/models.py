@@ -57,3 +57,10 @@ class Answer(models.Model):
                              choices=ANSWER_STATE_CHOICES)
     reason = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
+
+
+class Comment(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.PROTECT)
+    created = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()

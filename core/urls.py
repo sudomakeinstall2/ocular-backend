@@ -2,7 +2,7 @@ from django.urls import include, path
 
 from .project_views import (AnswerDetail, MilestoneDetail, MilestoneList,
                             ProjectDetail, ProjectList, ProjectProposalList,
-                            ProposalDetail, UserProposalList, SelfUserDetail, UserList)
+                            ProposalDetail, UserProposalList, SelfUserDetail, UserList, CommentList)
 
 urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
@@ -20,5 +20,6 @@ urlpatterns = [
     path('proposal/<int:pk>/', ProposalDetail.as_view(), name='proposal-detail'),
     path('answer/<int:pk>/', AnswerDetail.as_view(), name='answer-detail'),
     path('user/self/', SelfUserDetail.as_view(), name='self-user-detail'),
-    path('users/', UserList.as_view(), name='users-list')
+    path('users/', UserList.as_view(), name='users-list'),
+    path('project/<int:pk>/comments/', CommentList.as_view(), name='comment-list'),
 ]

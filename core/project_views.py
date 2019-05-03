@@ -9,9 +9,9 @@ from core.permissions import (HasAccessToAnswer, HasAccessToProposal,
                               IsEmployeeCreatingProposalForHerself, IsOwner,
                               IsProjectOwner, IsReadOnly, IsSameUser)
 
-from .models import Answer, Milestone, Project, Proposal
+from .models import Answer, Milestone, Project, Proposal, Comment
 from .serializers import (AnswerSerializer, MilestoneSerializer,
-                          ProjectSerializer, ProposalSerializer, UserSerializer)
+                          ProjectSerializer, ProposalSerializer, UserSerializer, CommentSerializer)
 
 logger = logging.getLogger(__name__)
 
@@ -110,3 +110,13 @@ class UserList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated, )
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class CommentList(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticated | IsReadOnly, )
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        project = Project.objects.get(pk=self.kwargs['pk'])
+        serializer.save(owner=self.request.user, project=project)

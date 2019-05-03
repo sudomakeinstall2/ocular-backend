@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Answer, Milestone, Project, Proposal
+from .models import Answer, Milestone, Project, Proposal, Comment
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -40,3 +40,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'id')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    project = serializers.ReadOnlyField(source='project.id')
+    owner = serializers.ReadOnlyField(source='owner.id')
+
+    class Meta:
+        model = Comment
+        exclude = ()
