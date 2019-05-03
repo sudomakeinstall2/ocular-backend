@@ -104,3 +104,9 @@ class SelfUserDetail(generics.RetrieveAPIView):
         obj = User.objects.get(pk=self.request.user.pk)
         self.check_object_permissions(self.request, obj)
         return obj
+
+
+class UserList(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
