@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     project = serializers.ReadOnlyField(source='project.id')
-    owner = serializers.ReadOnlyField(source='owner.id')
+    owner = serializers.ReadOnlyField(source='owner.email')
 
     class Meta:
         model = Comment
