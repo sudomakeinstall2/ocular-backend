@@ -12,9 +12,9 @@ class ProjectProposalListTestCase(APITestCase):
 
     def setUp(self):
         self.project = mommy.make(Project)
-        self.employee = mommy.make(User)
+        self.employee = mommy.make(User, email='a@b.com')
         self.url = reverse('project-proposal-list', args=(self.project.pk,))
-        self.proposal_data = {'cost': 1000, 'user': self.employee.pk}
+        self.proposal_data = {'cost': 1000, 'user': self.employee.email}
         self.expected_data = {
             'project': self.project.title,
             'cost': self.proposal_data['cost'],

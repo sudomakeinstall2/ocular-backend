@@ -40,8 +40,9 @@ class IsEmployeeCreatingProposalForHerself(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method != 'POST':
             return False
-
-        return request.user.pk == int(request.data['user'])
+        if not request.user.is_authenticated:
+            return False
+        return request.user.email == request.data['user']
 
 
 class HasAccessToProposal(permissions.BasePermission):

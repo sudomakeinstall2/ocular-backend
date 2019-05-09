@@ -24,6 +24,10 @@ class ProposalSerializer(serializers.ModelSerializer):
     project = serializers.ReadOnlyField(source='project.title')
     answer = serializers.ReadOnlyField(source='answer.id')
     answer_state = serializers.ReadOnlyField(source='answer.state')
+    user = serializers.SlugRelatedField(
+        slug_field='email',
+        queryset=User.objects.all()
+    )
 
     class Meta:
         model = Proposal

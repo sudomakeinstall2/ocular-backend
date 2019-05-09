@@ -11,6 +11,7 @@ class CommentListTestCase(APITestCase):
 
     def setUp(self):
         self.comment = mommy.make(Comment)
+        self.comment.owner.email = 'a@b.com'
         self.url = reverse('comment-list', args=(self.comment.project.id,))
         self.expected_data = {'content': self.comment.content, 'project': self.comment.project.id}
 
@@ -24,7 +25,7 @@ class CommentListTestCase(APITestCase):
         self.client.force_authenticate(user=self.comment.owner)
         expected = {
             'content': 'good',
-            'owner': self.comment.owner.id,
+            'owner': self.comment.owner.email,
             'project': self.comment.project.id,
         }
         response = self.client.post(self.url, {'content': 'good'})
