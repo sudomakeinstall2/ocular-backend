@@ -45,7 +45,10 @@ class MilestoneList(generics.ListCreateAPIView):
         return Milestone.objects.filter(project_id=self.kwargs['project_id']).order_by('deadline')
 
     def perform_create(self, serializer):
-        serializer.save(project=Project.objects.get(pk=self.kwargs['project_id']))
+        project = Project.objects.get(pk=self.kwargs['project_id'])
+        if serializer.validated_data['deadline'] > project.deadline:
+            raise ValidationError("Can't create milestone after deadline")
+        serializer.save(project=project)
 
 
 class ProjectProposalList(generics.ListCreateAPIView):
