@@ -120,3 +120,6 @@ class CommentList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         project = Project.objects.get(pk=self.kwargs['pk'])
         serializer.save(owner=self.request.user, project=project)
+
+    def get_queryset(self):
+        return Comment.objects.filter(project_id=self.kwargs['pk'])
