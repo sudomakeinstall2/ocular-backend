@@ -64,3 +64,24 @@ class Comment(models.Model):
     owner = models.ForeignKey(User, on_delete=models.PROTECT)
     created = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
+
+    @property
+    def like_count(self):
+        count = 0
+        for like in self.like_set.all():
+            if like.positive:
+                count += 1
+            else:
+                count -= 1
+        return count
+
+
+class Like(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.PROTECT)
+    positive = models.BooleanField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['comment', 'owner'], name='user_comment_like_unique')
+        ]

@@ -7,11 +7,11 @@ from rest_framework.exceptions import ValidationError
 
 from core.permissions import (HasAccessToAnswer, HasAccessToProposal,
                               IsEmployeeCreatingProposalForHerself, IsOwner,
-                              IsProjectOwner, IsReadOnly, IsSameUser)
+                              IsProjectOwner, IsReadOnly, IsSameUser, IsLikeOwner)
 
-from .models import Answer, Milestone, Project, Proposal, Comment
+from .models import Answer, Milestone, Project, Proposal, Comment, Like
 from .serializers import (AnswerSerializer, MilestoneSerializer,
-                          ProjectSerializer, ProposalSerializer, UserSerializer, CommentSerializer)
+                          ProjectSerializer, ProposalSerializer, UserSerializer, CommentSerializer, LikeSerializer)
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +117,6 @@ class UserList(generics.ListAPIView):
 
 class CommentList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated | IsReadOnly, )
-    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
     def perform_create(self, serializer):
@@ -126,3 +125,18 @@ class CommentList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Comment.objects.filter(project_id=self.kwargs['pk'])
+
+
+class LikeList(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = LikeSerializer
+
+    def perform_create(self, serializer):
+        comment = Comment.objects.get(pk=self.kwargs['pk'])
+        serializer.save(owner=self.request.user, comment=comment)
+
+
+class LikeDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsLikeOwner, )
+    serializer_class = LikeSerializer
+    queryset = Like.objects.all()

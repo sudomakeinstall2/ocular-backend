@@ -3,7 +3,7 @@ import logging
 from rest_framework import permissions
 from rest_framework.permissions import SAFE_METHODS
 
-from core.models import Answer, Project
+from core.models import Answer, Project, Like
 
 logger = logging.getLogger(__name__)
 
@@ -67,3 +67,9 @@ class HasAccessToAnswer(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return Answer.objects.get(pk=int(view.kwargs['pk'])).owner == request.user
+
+
+class IsLikeOwner(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return Like.objects.get(pk=int(view.kwargs['pk'])).owner == request.user

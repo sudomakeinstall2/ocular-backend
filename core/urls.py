@@ -2,7 +2,8 @@ from django.urls import include, path
 
 from .project_views import (AnswerDetail, MilestoneDetail, MilestoneList,
                             ProjectDetail, ProjectList, ProjectProposalList,
-                            ProposalDetail, UserProposalList, SelfUserDetail, UserList, CommentList)
+                            ProposalDetail, UserProposalList, SelfUserDetail,
+                            UserList, CommentList, LikeList, LikeDetail)
 
 urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
@@ -15,6 +16,10 @@ urlpatterns = [
          name='project-proposal-list'),
     path('user/<int:pk>/proposals/', UserProposalList.as_view(),
          name='user-proposal-list'),
+    path('comment/<int:pk>/likes/', LikeList.as_view(),
+         name='like-list'),
+    path('comment/<int:comment_id>/like/<int:pk>/', LikeDetail.as_view(),
+         name='like-detail'),
     path('projects/', ProjectList.as_view()),
     path('projects/<int:pk>/', ProjectDetail.as_view(), name='project-detail'),
     path('proposal/<int:pk>/', ProposalDetail.as_view(), name='proposal-detail'),

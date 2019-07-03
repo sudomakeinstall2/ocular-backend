@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Answer, Milestone, Project, Proposal, Comment
+from .models import Answer, Milestone, Project, Proposal, Comment, Like
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -40,6 +40,15 @@ class AnswerSerializer(serializers.ModelSerializer):
         exclude = ()
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    comment = serializers.ReadOnlyField(source='comment.id')
+    owner = serializers.ReadOnlyField(source='owner.email')
+
+    class Meta:
+        model = Like
+        exclude = ()
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -49,6 +58,8 @@ class UserSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     project = serializers.ReadOnlyField(source='project.id')
     owner = serializers.ReadOnlyField(source='owner.email')
+    id = serializers.ReadOnlyField()
+    like_count = serializers.ReadOnlyField()
 
     class Meta:
         model = Comment
