@@ -9,3 +9,5 @@ django-allauth
 django-rest-auth
 model_mommy
 django-cors-headers
+coveralls
+flake8
