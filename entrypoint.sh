@@ -11,6 +11,16 @@ then
     echo "Need to make migrations"
     exit 1
 fi
+
+if [[ "$CI" -eq "1" ]];
+then
+    coverage run ./manage.py test --keepdb
+    coverage report
+    coveralls
+    flake8
+    exit 0
+fi
+
 ./manage.py flush --no-input
 ./manage.py migrate
 ./manage.py collectstatic --no-input
